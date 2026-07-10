@@ -340,9 +340,9 @@ async function handleCSVImport() {
                 <td class="actions-td">
                   <div class="actions-group">
                     <RouterLink :to="{ name: 'admin-product-edit', params: { id: prod.id } }">
-                      <button class="action-btn edit-btn" title="Edit Product">✏️</button>
+                      <button class="action-btn edit-btn" title="Edit Product">Edit</button>
                     </RouterLink>
-                    <button class="action-btn delete-btn" title="Delete Product" @click="handleDelete(prod.id, prod.name)">🗑️</button>
+                    <button class="action-btn delete-btn" title="Delete Product" @click="handleDelete(prod.id, prod.name)">Remove</button>
                   </div>
                 </td>
               </tr>

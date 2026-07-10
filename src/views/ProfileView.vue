@@ -24,7 +24,7 @@ const profileForm = ref({
   city: '',
   state: '',
   zip: '',
-  country: 'United States'
+  country: 'Pakistan'
 })
 
 onMounted(async () => {
@@ -42,7 +42,7 @@ function prefillForm() {
       profileForm.value.city = addr.city || ''
       profileForm.value.state = addr.state || ''
       profileForm.value.zip = addr.zip || ''
-      profileForm.value.country = addr.country || 'United States'
+      profileForm.value.country = addr.country || 'Pakistan'
     }
   }
 }
@@ -86,6 +86,7 @@ async function handleSaveProfile() {
   } catch (err) {
     console.error(err)
     toast.error('Failed to save profile changes.')
+    console.log(err)
   } finally {
     savingProfile.value = false
   }
@@ -149,7 +150,7 @@ function getStatusVariant(status) {
             <BaseInput
               v-model="profileForm.phone"
               label="Phone Number"
-              placeholder="(555) 000-0000"
+              placeholder="+92 300 0000000"
               :disabled="savingProfile"
             />
           </div>
@@ -161,7 +162,7 @@ function getStatusVariant(status) {
             <BaseInput
               v-model="profileForm.street"
               label="Street Address"
-              placeholder="123 Main St"
+              placeholder="House No. 123, Street No. 456"
               :disabled="savingProfile"
             />
           </div>
@@ -170,19 +171,19 @@ function getStatusVariant(status) {
             <BaseInput
               v-model="profileForm.city"
               label="City"
-              placeholder="San Jose"
+              placeholder="Islamabad"
               :disabled="savingProfile"
             />
             <BaseInput
               v-model="profileForm.state"
-              label="State"
-              placeholder="CA"
+              label="Province"
+              placeholder="Federal"
               :disabled="savingProfile"
             />
             <BaseInput
               v-model="profileForm.zip"
               label="ZIP"
-              placeholder="95101"
+              placeholder="44000"
               :disabled="savingProfile"
             />
           </div>
@@ -194,6 +195,8 @@ function getStatusVariant(status) {
               <option value="Canada">Canada</option>
               <option value="United Kingdom">United Kingdom</option>
               <option value="Australia">Australia</option>
+              <option value="Pakistan">Pakistan</option>
+              <option value="India">India</option>
             </select>
           </div>
 
