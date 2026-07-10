@@ -26,10 +26,6 @@ function toggleUserMenu() {
   userMenuOpen.value = !userMenuOpen.value
 }
 
-function closeUserMenu() {
-  userMenuOpen.value = false
-}
-
 async function logout() {
   await authStore.logout()
   userMenuOpen.value = false
@@ -86,7 +82,7 @@ const navLinks = [
         </RouterLink>
 
         <!-- User Menu (logged in) -->
-        <div v-if="authStore.user" class="user-menu-wrapper" @mouseleave="closeUserMenu">
+        <div v-if="authStore.user" class="user-menu-wrapper">
           <button class="action-btn user-btn" @click="toggleUserMenu" aria-label="User menu">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </button>
