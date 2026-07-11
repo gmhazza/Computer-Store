@@ -65,10 +65,6 @@ const categoryIcons = {
             <RouterLink :to="{ name: 'products' }">
               <BaseButton variant="primary" size="lg">Explore Components</BaseButton>
             </RouterLink>
-            <BaseButton variant="ghost" size="lg" class="assistant-cta">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-              AI Assistant
-            </BaseButton>
           </div>
         </div>
       </div>

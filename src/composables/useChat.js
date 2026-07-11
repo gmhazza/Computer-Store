@@ -1,7 +1,7 @@
 import { ref } from 'vue'
  
 const CHAT_HISTORY_KEY = 'computer_store_chat_history'
-const API_URL = 'https://computer-store-backend.vercel.app/gemini'
+const API_URL = import.meta.env.VITE_BACKEND_URL + '/gemini'
  
 export function useChat() {
   const messages = ref([])
@@ -17,7 +17,6 @@ export function useChat() {
         messages.value = []
       }
     }
- 
     // Add default greeting if empty
     if (messages.value.length === 0) {
       messages.value.push({

@@ -22,51 +22,60 @@ export const useProductsStore = defineStore('products', () => {
     perPage: 12,
   })
 
-  async function fetchProducts(customFilters = {}) {
-    loading.value = true
-    try {
-      const f = { ...filters, ...customFilters }
-      let query = supabase
-        .from('products')
-        .select('*, categories(name, slug), brands(name, slug)', { count: 'exact' })
-        .eq('is_active', true)
+async function fetchProducts(customFilters = {}) {
+  loading.value = true
+  try {
+    const f = { ...filters, ...customFilters }
 
-      if (f.category) query = query.eq('category_id', f.category)
-      if (f.brand) query = query.eq('brand_id', f.brand)
-      if (f.search) query = query.ilike('name', `%${f.search}%`)
-      if (f.minPrice != null) query = query.gte('price', f.minPrice)
-      if (f.maxPrice != null) query = query.lte('price', f.maxPrice)
-      if (f.inStock) query = query.gt('stock_quantity', 0)
+    const response = await fetch('http://localhost:8080/fetchallproducts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(f),
+    })
 
-      const from = (f.page - 1) * f.perPage
-      const to = from + f.perPage - 1
-      query = query.order(f.sort, { ascending: f.sortDir === 'asc' }).range(from, to)
-
-      const { data, error, count } = await query
-      if (error) throw error
-      products.value = data || []
-      total.value = count || 0
-    } finally {
-      loading.value = false
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`)
     }
-  }
 
-  async function fetchProduct(slug) {
-    loading.value = true
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*, categories(id, name, slug), brands(id, name, slug)')
-        .eq('slug', slug)
-        .eq('is_active', true)
-        .single()
-      if (error) throw error
-      product.value = data
-      return data
-    } finally {
-      loading.value = false
-    }
+    const result = await response.json()
+    if (!result.success) throw new Error(result.error || 'Failed to fetch products')
+
+    products.value = result.products || []
+    total.value = result.total || 0
+  } catch (error) {
+    console.error('fetchProducts error:', error)
+    products.value = []
+    total.value = 0
+  } finally {
+    loading.value = false
   }
+}
+
+async function fetchProduct(slug) {
+  loading.value = true
+  try {
+    const response = await fetch('http://localhost:8080/fetchproduct', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug }),
+    })
+
+    const result = await response.json()
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || `Request failed with status ${response.status}`)
+    }
+
+    product.value = result.product
+    return result.product
+  } catch (error) {
+    console.error('fetchProduct error:', error)
+    product.value = null
+    return null
+  } finally {
+    loading.value = false
+  }
+}
 
   async function fetchFeatured() {
     const { data, error } = await supabase
