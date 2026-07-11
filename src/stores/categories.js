@@ -1,23 +1,32 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { supabase } from '@/lib/supabase'
+
 
 export const useCategoriesStore = defineStore('categories', () => {
   const categories = ref([])
   const loading = ref(false)
   const loaded = ref(false)
+  const API_URL = import.meta.env.VITE_BACKEND_URL
 
   async function fetchCategories() {
     if (loaded.value) return
     loading.value = true
     try {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name')
-      if (error) throw error
-      categories.value = data || []
+      const response = await fetch(`${API_URL}/fetchcategories`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || `Request failed with status ${response.status}`)
+      }
+
+      categories.value = result.categories || []
       loaded.value = true
+    } catch (error) {
+      console.error('fetchCategories error:', error)
     } finally {
       loading.value = false
     }
