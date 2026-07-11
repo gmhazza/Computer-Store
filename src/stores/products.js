@@ -12,6 +12,19 @@ export const useProductsStore = defineStore('products', () => {
   const total = ref(0)
   const loading = ref(false)
 
+  const filters = reactive({
+    category: null,
+    brand: null,
+    search: '',
+    minPrice: null,
+    maxPrice: null,
+    inStock: false,
+    sort: 'created_at',
+    sortDir: 'desc',
+    page: 1,
+    perPage: 12,
+  })
+
   async function fetchProducts(customFilters = {}) {
     loading.value = true
     try {
@@ -107,7 +120,7 @@ export const useProductsStore = defineStore('products', () => {
     }
   }
 
-  function resetFilters() {
+  async function resetFilters() {
     const newFilters = {
       category: null,
       brand: null,
@@ -120,11 +133,13 @@ export const useProductsStore = defineStore('products', () => {
       page: 1,
       perPage: 12,
     }
-    fetch (`${API_URL}/resetfilters`, {
+    const newFilter = await fetch (`${API_URL}/resetfilters`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newFilters),
     })
+    const result = await newFilter.filters.json()
+    Object.assign(filters, result)
   }
 
   return {
