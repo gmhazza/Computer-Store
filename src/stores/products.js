@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { ref, reactive } from 'vue'
-import { supabase } from '@/lib/supabase'
 
 
 const API_URL = import.meta.env.VITE_BACKEND_URL
@@ -138,7 +137,7 @@ export const useProductsStore = defineStore('products', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newFilters),
     })
-    const result = await newFilter.filters.json()
+    const result = await newFilter.json()
     Object.assign(filters, result)
   }
 
