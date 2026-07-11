@@ -12,110 +12,119 @@ export const useProductsStore = defineStore('products', () => {
   const total = ref(0)
   const loading = ref(false)
 
-  const filters = reactive({
-    category: null,
-    brand: null,
-    search: '',
-    minPrice: null,
-    maxPrice: null,
-    inStock: false,
-    sort: 'created_at',
-    sortDir: 'desc',
-    page: 1,
-    perPage: 12,
-  })
+  async function fetchProducts(customFilters = {}) {
+    loading.value = true
+    try {
+      const f = { ...filters, ...customFilters }
 
-async function fetchProducts(customFilters = {}) {
-  loading.value = true
-  try {
-    const f = { ...filters, ...customFilters }
+      const response = await fetch(`${API_URL}/fetchallproducts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(f),
+      })
 
-    const response = await fetch(`${API_URL}/fetchallproducts`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(f),
-    })
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`)
+      }
 
-    if (!response.ok) {
-      throw new Error(`Request failed with status ${response.status}`)
+      const result = await response.json()
+      if (!result.success) throw new Error(result.error || 'Failed to fetch products')
+
+      products.value = result.products || []
+      total.value = result.total || 0
+    } catch (error) {
+      console.error('fetchProducts error:', error)
+      products.value = []
+      total.value = 0
+    } finally {
+      loading.value = false
     }
-
-    const result = await response.json()
-    if (!result.success) throw new Error(result.error || 'Failed to fetch products')
-
-    products.value = result.products || []
-    total.value = result.total || 0
-  } catch (error) {
-    console.error('fetchProducts error:', error)
-    products.value = []
-    total.value = 0
-  } finally {
-    loading.value = false
   }
-}
 
-async function fetchProduct(slug) {
-  loading.value = true
-  try {
-    const response = await fetch(`${API_URL}/fetchproduct`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug }),
-    })
+  async function fetchProduct(slug) {
+    loading.value = true
+    try {
+      const response = await fetch(`${API_URL}/fetchproduct`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug }),
+      })
 
-    const result = await response.json()
+      const result = await response.json()
 
-    if (!response.ok || !result.success) {
-      throw new Error(result.error || `Request failed with status ${response.status}`)
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || `Request failed with status ${response.status}`)
+      }
+
+      product.value = result.product
+      return result.product
+    } catch (error) {
+      console.error('fetchProduct error:', error)
+      product.value = null
+      return null
+    } finally {
+      loading.value = false
     }
-
-    product.value = result.product
-    return result.product
-  } catch (error) {
-    console.error('fetchProduct error:', error)
-    product.value = null
-    return null
-  } finally {
-    loading.value = false
   }
-}
 
   async function fetchFeatured() {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*, categories(name, slug), brands(name, slug)')
-      .eq('is_active', true)
-      .eq('is_featured', true)
-      .order('created_at', { ascending: false })
-      .limit(8)
-    if (!error) {
-      featuredProducts.value = data || []
+    try {
+      const response = await fetch(`${API_URL}/fetchfeatured`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || `Request failed with status ${response.status}`)
+      }
+
+      featuredProducts.value = result.products || []
+    } catch (error) {
+      console.error('fetchFeatured error:', error)
     }
   }
 
   async function fetchRelated(categoryId, excludeId, limit = 4) {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*, categories(name, slug), brands(name, slug)')
-      .eq('is_active', true)
-      .eq('category_id', categoryId)
-      .neq('id', excludeId)
-      .order('is_featured', { ascending: false })
-      .limit(limit)
-    if (!error) return data || []
-    return []
+    try {
+      const response = await fetch(`${API_URL}/fetchrelated`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoryId, excludeId, limit }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || `Request failed with status ${response.status}`)
+      }
+
+      return result.products || []
+    } catch (error) {
+      console.error('fetchRelated error:', error)
+      return []
+    }
   }
 
   function resetFilters() {
-    filters.category = null
-    filters.brand = null
-    filters.search = ''
-    filters.minPrice = null
-    filters.maxPrice = null
-    filters.inStock = false
-    filters.sort = 'created_at'
-    filters.sortDir = 'desc'
-    filters.page = 1
+    const newFilters = {
+      category: null,
+      brand: null,
+      search: '',
+      minPrice: null,
+      maxPrice: null,
+      inStock: false,
+      sort: 'created_at',
+      sortDir: 'desc',
+      page: 1,
+      perPage: 12,
+    }
+    fetch (`${API_URL}/resetfilters`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newFilters),
+    })
   }
 
   return {
