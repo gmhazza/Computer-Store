@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 import { ref, reactive } from 'vue'
 import { supabase } from '@/lib/supabase'
 
+
+const API_URL = import.meta.env.VITE_BACKEND_URL
+
 export const useProductsStore = defineStore('products', () => {
   const products = ref([])
   const product = ref(null)
@@ -27,7 +30,7 @@ async function fetchProducts(customFilters = {}) {
   try {
     const f = { ...filters, ...customFilters }
 
-    const response = await fetch('http://localhost:8080/fetchallproducts', {
+    const response = await fetch(`${API_URL}/fetchallproducts`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(f),
@@ -54,7 +57,7 @@ async function fetchProducts(customFilters = {}) {
 async function fetchProduct(slug) {
   loading.value = true
   try {
-    const response = await fetch('http://localhost:8080/fetchproduct', {
+    const response = await fetch(`${API_URL}/fetchproduct`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ slug }),
