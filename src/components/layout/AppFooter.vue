@@ -36,19 +36,10 @@ import { RouterLink } from 'vue-router'
           <RouterLink :to="{ name: 'cart' }" class="footer-link">Cart</RouterLink>
           <RouterLink :to="{ name: 'profile' }" class="footer-link">My Orders</RouterLink>
         </div>
-
-        <!-- Support -->
-        <div class="footer-col">
-          <h4 class="footer-heading">Support</h4>
-          <span class="footer-link">Contact Us</span>
-          <span class="footer-link">Shipping Info</span>
-          <span class="footer-link">Return Policy</span>
-          <span class="footer-link">FAQ</span>
-        </div>
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; {{ new Date().getFullYear() }} ComputerStore. All rights reserved.</p>
+        <p>&copy; {{ new Date().getFullYear() }} Computer Store. All rights reserved.</p>
       </div>
     </div>
   </footer>
